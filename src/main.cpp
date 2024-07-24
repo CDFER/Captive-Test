@@ -69,13 +69,15 @@ void startSoftAccessPoint(const char *ssid, const char *password, const IPAddres
 	// Start the soft access point with the given ssid, password, channel, max number of clients
 	WiFi.softAP(ssid, password, WIFI_CHANNEL, 0, MAX_CLIENTS);
 
-	// Disable AMPDU RX on the ESP32 WiFi to fix a bug on Android
+	// Disable AMPDU RX on the ESP32 WiFi to fix a bug on Android (This code below will increase the stack usage by ~40kiB but does fix quite a few android phones. Thx @EmbeddedDevver)
+	//-----------------------------------------------------
 	esp_wifi_stop();
 	esp_wifi_deinit();
 	wifi_init_config_t my_config = WIFI_INIT_CONFIG_DEFAULT();
 	my_config.ampdu_rx_enable = false;
 	esp_wifi_init(&my_config);
 	esp_wifi_start();
+	//-----------------------------------------------------
 	vTaskDelay(100 / portTICK_PERIOD_MS);  // Add a small delay
 }
 
